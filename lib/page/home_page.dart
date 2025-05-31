@@ -87,19 +87,43 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: Row(
-          children: [
-            CircleAvatar(
-              backgroundImage: NetworkImage(
-                  'https://www.pinterest.com/pin/55028426691106833/'),
-            ),
-            Text("Deliver to"),
-            Text("Palazhi , Calicut")
-          ],
-        ),
+      backgroundColor: Colors.black,
+      body: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  CircleAvatar(
+                    backgroundColor: const Color.fromARGB(255, 4, 93, 7),
+                  ),
+                  Column(
+                    children: [
+                      Text(
+                        "Deliver to",
+                        style: TextStyle(
+                          color: Colors.grey,
+                        ),
+                      ),
+                      Text(
+                        "Palazhi , Calicut",
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              Icon(
+                Icons.notifications,
+                color: Colors.white,
+              )
+            ],
+          ),
+        ],
       ),
-      body: Column(),
     );
   }
 }
