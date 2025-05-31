@@ -12,7 +12,7 @@ class RecipesModel {
   final int cookTime;
   final int totalTime;
   final int servings;
-  final int yieldi;
+  final String yieldi;
   final String ingredients;
   final String directions;
   final String tags;
@@ -21,7 +21,7 @@ class RecipesModel {
   final String photoUrl;
   final bool private;
   final String nutritionalScoreGeneric;
-  final int calories;
+  final String calories;
   final String fat;
   final String cholesterol;
   final String sodium;
@@ -79,7 +79,7 @@ class RecipesModel {
       cookTime: json['cookTime'] ?? 0,
       totalTime: json['totalTime'] ?? 0,
       servings: json['servings'] ?? 0,
-      yieldi: json['yield'] ?? 0,
+      yieldi: json['yield'] != null ? json['yield'].toString() : '',
       ingredients: json['ingredients'] ?? '',
       directions: json['directions'] ?? '',
       tags: json['tags'] ?? '',
@@ -88,10 +88,10 @@ class RecipesModel {
       photoUrl: json['photoUrl'] ?? '',
       private: json['private'] == 'yes' ? true : false,
       nutritionalScoreGeneric: json['nutritionalScoreGeneric'] ?? '',
-      calories: json['calories'] ?? 0,
+      calories: json['calories'] != null ? json['calories'].toString() : '',
       fat: json['fat'] ?? '',
       cholesterol: json['cholesterol'] ?? '',
-      sodium: json['sodium'] ?? '',
+      sodium: json['sodium'] != null ? json['sodium'].toString() : '',
       sugar: json['sugar'] ?? '',
       carbohydrate: json['carbohydrate'] ?? '',
       fiber: json['fiber'] ?? '',
@@ -99,4 +99,40 @@ class RecipesModel {
       cost: json['cost'] ?? '',
     );
   }
+
+  Map<String, dynamic> toJson() {
+  return {
+    'title': title,
+    'course': course,
+    'cuisine': cuisine,
+    'mainIngredient': mainIngredient,
+    'description': description,
+    'source': source,
+    'url': url,
+    'urlHost': urlHost,
+    'prepTime': prepTime,
+    'cookTime': cookTime,
+    'totalTime': totalTime,
+    'servings': servings,
+    'yield': yieldi,
+    'ingredients': ingredients,
+    'directions': directions,
+    'tags': tags,
+    'rating': rating,
+    'publicUrl': publicUrl,
+    'photoUrl': photoUrl,
+    'private': private ? 'yes' : 'no',
+    'nutritionalScoreGeneric': nutritionalScoreGeneric,
+    'calories': calories,
+    'fat': fat,
+    'cholesterol': cholesterol,
+    'sodium': sodium,
+    'sugar': sugar,
+    'carbohydrate': carbohydrate,
+    'fiber': fiber,
+    'protein': protein,
+    'cost': cost,
+  };
+}
+
 }
