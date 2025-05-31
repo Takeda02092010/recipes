@@ -87,6 +87,19 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+List<Map<String, dynamic>> LesProducts = [
+  {
+    'name': 'Olma',
+    'price': '5000 soʻm',
+    'image': 'https://upload.wikimedia.org/wikipedia/commons/1/15/Red_Apple.jpg',
+  },
+  {
+    'name': 'Banan',
+    'price': '7000 soʻm',
+    'image': 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Banana-Single.jpg',
+  },
+];
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Column(
@@ -105,7 +118,7 @@ class HomePage extends StatelessWidget {
                         "Deliver to",
                         style: TextStyle(
                           color: Colors.grey,
-                          fontSize: 20.0,
+                          //fontSize: 20.0,
                         ),
                       ),
                       Text(
@@ -201,60 +214,60 @@ class HomePage extends StatelessWidget {
               ),
             ],
           ),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: 59,
-              itemBuilder: (context, index) {
-                final product = LesProducts[index];
-                return InkWell(
-                  onTap: () { 
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => DetailsPage(product: product),
-                      ),
-                    );
-                  },
-                  child: Card(
-                    margin: const EdgeInsets.all(12),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          Image.network(
-                            product['image'],
-                            width: 80,
-                            height: 80,
-                            fit: BoxFit.cover,
-                          ),
-                          const SizedBox(width: 16),
-                          SizedBox(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  product['name'],
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: LesProducts.length,
+            itemBuilder: (context, index) {
+              final product = LesProducts[index];
+              return InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => DetailsPage(product: product),
+                    ),
+                  );
+                },
+                child: Card(
+                  margin: const EdgeInsets.all(12),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        Image.network(
+                          product['image'],
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                        ),
+                        const SizedBox(width: 16),
+                        SizedBox(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                product['name'],
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  product['price'],
-                                  style: const TextStyle(fontSize: 16),
-                                ),
-                              ],
-                            ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                product['price'],
+                                style: const TextStyle(fontSize: 16),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
+          ),
         ],
       ),
     );
