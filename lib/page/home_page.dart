@@ -80,6 +80,7 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:recipes/page/details_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -104,12 +105,14 @@ class HomePage extends StatelessWidget {
                         "Deliver to",
                         style: TextStyle(
                           color: Colors.grey,
+                          fontSize: 20.0,
                         ),
                       ),
                       Text(
                         "Palazhi , Calicut",
                         style: TextStyle(
                           color: Colors.white,
+                          fontSize: 20.0,
                         ),
                       ),
                     ],
@@ -122,6 +125,136 @@ class HomePage extends StatelessWidget {
               )
             ],
           ),
+          SizedBox(
+            height: 10,
+          ),
+          TextField(
+            decoration: InputDecoration(
+              suffixIcon: Icon(
+                Icons.search,
+                color: Colors.white,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(8.0),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 10.0,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "MENU",
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
+              ),
+              Text(
+                "SORT BY",
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Frequent order',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 17.0,
+                ),
+              ),
+              Text(
+                'Veg',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 17.0,
+                ),
+              ),
+              Text(
+                'Fish',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 17.0,
+                ),
+              ),
+              Text(
+                'Egg',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 17.0,
+                ),
+              ),
+              Text(
+                'Chicken',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 17.0,
+                ),
+              ),
+            ],
+          ),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: 59,
+              itemBuilder: (context, index) {
+                final product = LesProducts[index];
+                return InkWell(
+                  onTap: () { 
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => DetailsPage(product: product),
+                      ),
+                    );
+                  },
+                  child: Card(
+                    margin: const EdgeInsets.all(12),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          Image.network(
+                            product['image'],
+                            width: 80,
+                            height: 80,
+                            fit: BoxFit.cover,
+                          ),
+                          const SizedBox(width: 16),
+                          SizedBox(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  product['name'],
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  product['price'],
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
         ],
       ),
     );
