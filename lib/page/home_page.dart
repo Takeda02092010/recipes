@@ -76,197 +76,238 @@
 //         },
 //       ),
 //     );
-//   }
 // }
 
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:recipes/page/details_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
+  Future<List<dynamic>> fetchRecipes() async {
+    final response = await http.get(
+      Uri.parse("https://api.sampleapis.com/recipes/recipes"),
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to load recipes');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-List<Map<String, dynamic>> LesProducts = [
-  {
-    'name': 'Olma',
-    'price': '5000 soʻm',
-    'image': 'https://upload.wikimedia.org/wikipedia/commons/1/15/Red_Apple.jpg',
-  },
-  {
-    'name': 'Banan',
-    'price': '7000 soʻm',
-    'image': 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Banana-Single.jpg',
-  },
-];
-
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  CircleAvatar(
-                    backgroundColor: const Color.fromARGB(255, 4, 93, 7),
-                  ),
-                  Column(
-                    children: [
-                      Text(
-                        "Deliver to",
-                        style: TextStyle(
-                          color: Colors.grey,
-                          //fontSize: 20.0,
-                        ),
-                      ),
-                      Text(
-                        "Palazhi , Calicut",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20.0,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              Icon(
-                Icons.notifications,
-                color: Colors.white,
-              )
-            ],
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          TextField(
-            decoration: InputDecoration(
-              suffixIcon: Icon(
-                Icons.search,
-                color: Colors.white,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(8.0),
-                ),
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 10.0,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "MENU",
-                style: TextStyle(
-                  color: Colors.grey,
-                ),
-              ),
-              Text(
-                "SORT BY",
-                style: TextStyle(
-                  color: Colors.grey,
-                ),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Frequent order',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 17.0,
-                ),
-              ),
-              Text(
-                'Veg',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 17.0,
-                ),
-              ),
-              Text(
-                'Fish',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 17.0,
-                ),
-              ),
-              Text(
-                'Egg',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 17.0,
-                ),
-              ),
-              Text(
-                'Chicken',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 17.0,
-                ),
-              ),
-            ],
-          ),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: LesProducts.length,
-            itemBuilder: (context, index) {
-              final product = LesProducts[index];
-              return InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => DetailsPage(product: product),
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: const Color.fromARGB(255, 4, 93, 7),
                     ),
-                  );
-                },
-                child: Card(
-                  margin: const EdgeInsets.all(12),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
+                    Column(
                       children: [
-                        Image.network(
-                          product['image'],
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover,
+                        Text(
+                          "Deliver to",
+                          style: TextStyle(
+                            color: Colors.grey,
+                            //fontSize: 20.0,
+                          ),
                         ),
-                        const SizedBox(width: 16),
-                        SizedBox(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                product['name'],
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                product['price'],
-                                style: const TextStyle(fontSize: 16),
-                              ),
-                            ],
+                        Text(
+                          "Palazhi , Calicut",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20.0,
                           ),
                         ),
                       ],
                     ),
+                  ],
+                ),
+                Icon(
+                  Icons.notifications,
+                  color: Colors.white,
+                )
+              ],
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            TextField(
+              decoration: InputDecoration(
+                suffixIcon: Icon(
+                  Icons.search,
+                  color: Colors.white,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(8.0),
                   ),
                 ),
-              );
-            },
+              ),
+            ),
+            SizedBox(
+              height: 10.0,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "MENU",
+                  style: TextStyle(
+                    color: Colors.grey,
+                  ),
+                ),
+                Text(
+                  "SORT BY",
+                  style: TextStyle(
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Frequent order',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 17.0,
+                  ),
+                ),
+                Text(
+                  'Veg',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 17.0,
+                  ),
+                ),
+                Text(
+                  'Fish',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 17.0,
+                  ),
+                ),
+                Text(
+                  'Egg',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 17.0,
+                  ),
+                ),
+                Text(
+                  'Chicken',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 17.0,
+                  ),
+                ),
+              ],
+            ),
+            Expanded(
+              child: FutureBuilder<List<dynamic>>(
+                future: fetchRecipes(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: \\${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text('No recipes found'));
+                  }
+                  final recipes = snapshot.data!;
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: recipes.length,
+                    itemBuilder: (context, index) {
+                      final product = recipes[index];
+                      return InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => DetailsPage(product: product),
+                            ),
+                          );
+                        },
+                        child: Card(
+                          margin: const EdgeInsets.all(12),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              children: [
+                                if (product.photoUrl != null &&
+                                    product.photoUrl != '')
+                                  Image.network(
+                                    product.photoUrl,
+                                    width: 80,
+                                    height: 80,
+                                    fit: BoxFit.cover,
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            const Icon(Icons.broken_image),
+                                  ),
+                                const SizedBox(width: 16),
+                                SizedBox(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        product.title ?? 'No name',
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        product.course?.toString() ?? '',
+                                        style: const TextStyle(fontSize: 16),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: '',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.location_on),
+            label: '',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: '',
+          ),BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: '',
           ),
         ],
       ),
