@@ -78,202 +78,208 @@
 //     );
 // }
 
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:recipes/model/recipes_model.dart';
 import 'package:recipes/page/details_page.dart';
+import 'package:recipes/repo/recipes_repo.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
-  Future<List<dynamic>> fetchRecipes() async {
-    final response = await http.get(
-      Uri.parse("https://api.sampleapis.com/recipes/recipes"),
-    );
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception('Failed to load recipes');
-    }
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final TextEditingController _searchController = TextEditingController();
+  List<RecipesModel> filteredRecipes = [];
+
+  @override
+  void dispose() {
+    super.dispose();
+    _searchController.dispose();
   }
 
+  void _filterProducts(String query) {
+    filteredRecipes = filteredRecipes.where((element) {
+      bool contains = element.title.toLowerCase().contains(query);
+
+      if (contains) {
+        print(element.title);
+        print(query);
+      }
+      return contains;
+    }).toList();
+    setState(() {});
+  }
+
+  List<String> categories = ['Frequent order', 'Veg', 'Fish', 'Egg', 'Chicken'];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    CircleAvatar(
-                      backgroundColor: const Color.fromARGB(255, 4, 93, 7),
-                    ),
-                    Column(
+                    Row(
                       children: [
-                        Text(
-                          "Deliver to",
-                          style: TextStyle(
-                            color: Colors.grey,
-                            //fontSize: 20.0,
-                          ),
+                        CircleAvatar(
+                          backgroundColor: const Color.fromARGB(255, 4, 93, 7),
                         ),
-                        Text(
-                          "Palazhi , Calicut",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20.0,
-                          ),
+                        Column(
+                          children: [
+                            Text(
+                              "Deliver to",
+                              style: TextStyle(
+                                color: Colors.grey,
+                                //fontSize: 20.0,
+                              ),
+                            ),
+                            Text(
+                              "Palazhi , Calicut",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20.0,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
+                    Icon(Icons.notifications)
                   ],
                 ),
-                Icon(
-                  Icons.notifications,
-                  color: Colors.white,
-                )
-              ],
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            TextField(
-              decoration: InputDecoration(
-                suffixIcon: Icon(
-                  Icons.search,
-                  color: Colors.white,
+                SizedBox(
+                  height: 10,
                 ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(8.0),
+                TextField(
+                  onTapOutside: (event) => FocusScope.of(context).unfocus(),
+                  controller: _searchController,
+                  onChanged: (value) => _filterProducts(value),
+                  decoration: InputDecoration(
+                    suffixIcon: Icon(
+                      Icons.search,
+                      color: Colors.white,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(8.0),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-            SizedBox(
-              height: 10.0,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "MENU",
-                  style: TextStyle(
-                    color: Colors.grey,
-                  ),
+                SizedBox(
+                  height: 10.0,
                 ),
-                Text(
-                  "SORT BY",
-                  style: TextStyle(
-                    color: Colors.grey,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "MENU",
+                      style: TextStyle(
+                        color: Colors.grey,
+                      ),
+                    ),
+                    Text(
+                      "SORT BY",
+                      style: TextStyle(
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Frequent order',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 17.0,
-                  ),
-                ),
-                Text(
-                  'Veg',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 17.0,
-                  ),
-                ),
-                Text(
-                  'Fish',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 17.0,
-                  ),
-                ),
-                Text(
-                  'Egg',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 17.0,
-                  ),
-                ),
-                Text(
-                  'Chicken',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 17.0,
-                  ),
-                ),
-              ],
-            ),
-            Expanded(
-              child: FutureBuilder<List<dynamic>>(
-                future: fetchRecipes(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: \\${snapshot.error}'));
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(child: Text('No recipes found'));
-                  }
-                  final recipes = snapshot.data!;
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: recipes.length,
+                SizedBox(
+                  height: 35.0,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: categories.length,
+                    separatorBuilder: (context, index) {
+                      return SizedBox(width: 25.0);
+                    },
                     itemBuilder: (context, index) {
-                      final product = recipes[index];
-                      return InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => DetailsPage(product: product),
-                            ),
-                          );
-                        },
-                        child: Card(
-                          margin: const EdgeInsets.all(12),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
+                      return Text(
+                        categories[index],
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 17.0,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                FutureBuilder(
+                  future: RecipesRepo().getAllRecipes(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: \\${snapshot.error}'));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Center(child: Text('No recipes found'));
+                    }
+                    final recipes = snapshot.data!;
+                    filteredRecipes.addAll(recipes);
+                    return GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: filteredRecipes.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisExtent: 300,
+                      ),
+                      itemBuilder: (context, index) {
+                        final product = filteredRecipes[index];
+                        return InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => DetailsPage(product: product),
+                              ),
+                            );
+                          },
+                          child: Card(
+                            margin: const EdgeInsets.all(12),
                             child: Column(
                               children: [
-                                if (product.photoUrl != null &&
-                                    product.photoUrl != '')
-                                  Image.network(
+                                ClipRRect(
+                                  borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(12.0),
+                                  ),
+                                  child: Image.network(
                                     product.photoUrl,
-                                    width: 80,
-                                    height: 80,
                                     fit: BoxFit.cover,
+                                    height: 200,
+                                    width: double.infinity,
                                     errorBuilder:
                                         (context, error, stackTrace) =>
                                             const Icon(Icons.broken_image),
                                   ),
-                                const SizedBox(width: 16),
-                                SizedBox(
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.all(12.0),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        product.title ?? 'No name',
+                                        product.title,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.clip,
                                         style: const TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      const SizedBox(height: 8),
                                       Text(
-                                        product.course?.toString() ?? '',
+                                        "${product.calories} ccal",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.clip,
                                         style: const TextStyle(fontSize: 16),
                                       ),
                                     ],
@@ -282,14 +288,14 @@ class HomePage extends StatelessWidget {
                               ],
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -305,7 +311,8 @@ class HomePage extends StatelessWidget {
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),
             label: '',
-          ),BottomNavigationBarItem(
+          ),
+          BottomNavigationBarItem(
             icon: Icon(Icons.settings),
             label: '',
           ),
