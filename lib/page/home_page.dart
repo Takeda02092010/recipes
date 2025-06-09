@@ -79,6 +79,8 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:recipes/providers/updateDelete.dart';
 import 'package:recipes/model/recipes_model.dart';
 import 'package:recipes/page/details_page.dart';
 import 'package:recipes/repo/recipes_repo.dart';
@@ -93,6 +95,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
   List<RecipesModel> filteredRecipes = [];
+
+  // Add this: List of controllers for editing recipe fields
+  final List<TextEditingController> controllers =
+      List.generate(29, (index) => TextEditingController());
+
+  // Add this: variable for private field
+  bool privateValue = false;
 
   @override
   void dispose() {
@@ -113,7 +122,182 @@ class _HomePageState extends State<HomePage> {
     setState(() {});
   }
 
+  //   List<RecipesModel> recipe = [];
+  bool isPressed = false;
+
+  // final titleController = TextEditingController();
+  // final bodyController = TextEditingController();
+
+  // void _editUserDialog(RecipesModel PostJSon) {
+  //   titleController.text = PostJSon.title;
+  //   bodyController.text = PostJSon.body;
+
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) {
+  //       return AlertDialog(
+  //         title: const Text("Edit reicpe"),
+  //         content: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             TextField(
+  //               controller: titleController,
+  //               decoration: const InputDecoration(labelText: "title"),
+  //             ),
+  //             TextField(
+  //               controller: bodyController,
+  //               decoration: const InputDecoration(labelText: "body "),
+  //             ),
+  //           ],
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () async {
+  //               final updatedJsonPost = PostJson(
+  //                 id: PostJSon.id,
+  //                 title: titleController.text,
+  //                 body: bodyController.text,
+  //                 userId: PostJSon.userId,
+  //               );
+  //               await repo.updateJsonPost(updatedJsonPost);
+  //               Navigator.of(context).pop();
+  //               setState(() {});
+  //             },
+  //             child: const Text("Save"),
+  //           ),
+  //           TextButton(
+  //             onPressed: () => Navigator.of(context).pop(),
+  //             child: const Text("Cancel"),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
+  void editFullRecipeDialog(RecipesModel recipe) {
+    controllers[0].text = recipe.title;
+    controllers[1].text = recipe.course;
+    controllers[2].text = recipe.cuisine;
+    controllers[3].text = recipe.mainIngredient;
+    controllers[4].text = recipe.description;
+    controllers[5].text = recipe.source;
+    controllers[6].text = recipe.url;
+    controllers[7].text = recipe.urlHost;
+    controllers[8].text = recipe.prepTime.toString();
+    controllers[9].text = recipe.cookTime.toString();
+    controllers[10].text = recipe.totalTime.toString();
+    controllers[11].text = recipe.servings.toString();
+    controllers[12].text = recipe.yieldi;
+    controllers[13].text = recipe.ingredients;
+    controllers[14].text = recipe.directions;
+    controllers[15].text = recipe.tags;
+    controllers[16].text = recipe.rating;
+    controllers[17].text = recipe.publicUrl;
+    controllers[18].text = recipe.photoUrl;
+    privateValue = recipe.private;
+    controllers[19].text = recipe.nutritionalScoreGeneric;
+    controllers[20].text = recipe.calories;
+    controllers[21].text = recipe.fat;
+    controllers[22].text = recipe.cholesterol;
+    controllers[23].text = recipe.sodium;
+    controllers[24].text = recipe.sugar;
+    controllers[25].text = recipe.carbohydrate;
+    controllers[26].text = recipe.fiber;
+    controllers[27].text = recipe.protein;
+    controllers[28].text = recipe.cost;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          scrollable: true,
+          title: const Text("Edit Recipe"),
+          content: Column(
+            children: [
+              for (int i = 0; i < controllers.length; i++)
+                TextField(
+                  controller: controllers[i],
+                  decoration: InputDecoration(labelText: "Field $i"),
+                ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                final updatedRecipe = RecipesModel(
+                  id: recipe.id,
+                  title: controllers[0].text,
+                  course: controllers[1].text,
+                  cuisine: controllers[2].text,
+                  mainIngredient: controllers[3].text,
+                  description: controllers[4].text,
+                  source: controllers[5].text,
+                  url: controllers[6].text,
+                  urlHost: controllers[7].text,
+                  prepTime: int.parse(controllers[8].text),
+                  cookTime: int.parse(controllers[9].text),
+                  totalTime: int.parse(controllers[10].text),
+                  servings: int.parse(controllers[11].text),
+                  yieldi: controllers[12].text,
+                  ingredients: controllers[13].text,
+                  directions: controllers[14].text,
+                  tags: controllers[15].text,
+                  rating: controllers[16].text,
+                  publicUrl: controllers[17].text,
+                  photoUrl: controllers[18].text,
+                  private: privateValue,
+                  nutritionalScoreGeneric: controllers[19].text,
+                  calories: controllers[20].text,
+                  fat: controllers[21].text,
+                  cholesterol: controllers[22].text,
+                  sodium: controllers[23].text,
+                  sugar: controllers[24].text,
+                  carbohydrate: controllers[25].text,
+                  fiber: controllers[26].text,
+                  protein: controllers[27].text,
+                  cost: controllers[28].text,
+                );
+
+                final box = Hive.box<RecipesModel>('recipesBox');
+                box.put(recipe.id, updatedRecipe);
+                Navigator.of(context).pop();
+                setState(() {});
+              },
+              child: TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("Save"),
+            ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("Cancel"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteUser(int id) async {
+    setState(() {
+      isPressed = true;
+    });
+    try {
+      await RecipesRepo().deleteRecipe(id);
+      setState(() {
+        filteredRecipes.removeWhere((w) => w.id == id);
+      });
+    } catch (e) {
+      throw Exception(e);
+    } finally {
+      setState(() {
+        isPressed = false;
+      });
+    }
+  }
+
   List<String> categories = ['Frequent order', 'Veg', 'Fish', 'Egg', 'Chicken'];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -277,13 +461,38 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                       Text(
-                                        "${product.calories} ccal",
+                                        "${product.cost} ",
                                         maxLines: 1,
                                         overflow: TextOverflow.clip,
                                         style: const TextStyle(fontSize: 16),
                                       ),
                                     ],
                                   ),
+                                ),
+                                // Updatedelete(product: product, recipesRepo: RecipesRepo()),
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      onPressed: () {
+                                        editFullRecipeDialog(product);
+                                        setState(() {});
+                                      },
+                                      icon: Icon(
+                                        Icons.edit,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    IconButton(
+                                      onPressed: () {
+                                        _deleteUser(product.id);
+                                        setState(() {});
+                                      },
+                                      icon: Icon(
+                                        Icons.delete,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  ],
                                 ),
                               ],
                             ),
@@ -302,15 +511,15 @@ class _HomePageState extends State<HomePage> {
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: '',
+            label: 'Home',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.location_on),
-            label: '',
+            label: 'Location',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),
-            label: '',
+            label: 'Shoppping',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
