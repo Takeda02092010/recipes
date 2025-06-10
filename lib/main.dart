@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:recipes/page/home_page.dart';
 
-void main() {
+void main() async {
+  await Hive.initFlutter();
+
+  await Hive.openBox('recipesBox');
+  await Hive.openBox('recipeBox');
+
   runApp(const MyApp());
 }
 

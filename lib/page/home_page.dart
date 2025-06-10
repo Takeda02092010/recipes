@@ -84,6 +84,7 @@ import 'package:recipes/providers/updateDelete.dart';
 import 'package:recipes/model/recipes_model.dart';
 import 'package:recipes/page/details_page.dart';
 import 'package:recipes/repo/recipes_repo.dart';
+import 'package:recipes/showAddRecipeDialog.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -264,9 +265,9 @@ class _HomePageState extends State<HomePage> {
                 setState(() {});
               },
               child: TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text("Save"),
-            ),
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text("Save"),
+              ),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -506,6 +507,11 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => showAddRecipeDialog(context),
+        icon: const Icon(Icons.add),
+        label: const Text("Add Recipe"),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const [

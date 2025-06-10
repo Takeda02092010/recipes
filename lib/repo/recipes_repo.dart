@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'package:hive/hive.dart';
 import 'package:recipes/model/recipes_model.dart';
 import 'package:http/http.dart' as http;
 
 class RecipesRepo {
   Future<List<RecipesModel>> getAllRecipes() async {
+     final recipeBox = Hive.box('recipeBox');
     try {
       final incomingData = await http.get(
         Uri.parse("https://api.sampleapis.com/recipes/recipes"),
@@ -12,7 +14,13 @@ class RecipesRepo {
       final List<RecipesModel> recipesModels =
           data.map((e) => RecipesModel.fromJson(e)).toList();
       return recipesModels;
-    } catch (e) {
+    } catch (e) { if (recipeBox.containsKey('posts')) {
+        try {
+          return recipeBox.get('posts')!.cast<RecipesModel>();
+        } catch (e) {
+          throw Exception("Xato");
+        }
+      }
       throw Exception(e);
     }
   }
