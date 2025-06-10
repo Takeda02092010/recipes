@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:recipes/model/recipes_model.dart';
 import 'package:recipes/page/home_page.dart';
+import 'package:recipes/providers/recipes_provider.dart';
 
 void main() async {
   await Hive.initFlutter();
+  Hive.registerAdapter(RecipesModelAdapter());
 
   await Hive.openBox('recipesBox');
   await Hive.openBox('recipeBox');
@@ -16,7 +20,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return ChangeNotifierProvider(
+      create: (context) => RecipesProvider(),
+      child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         themeMode: ThemeMode.dark,
@@ -25,6 +31,8 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: const HomePage());
+        home: const HomePage(),
+      ),
+    );
   }
 }

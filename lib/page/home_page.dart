@@ -80,11 +80,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:recipes/providers/updateDelete.dart';
 import 'package:recipes/model/recipes_model.dart';
 import 'package:recipes/page/details_page.dart';
+import 'package:recipes/providers/recipes_provider.dart';
 import 'package:recipes/repo/recipes_repo.dart';
 import 'package:recipes/showAddRecipeDialog.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -97,12 +98,17 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
   List<RecipesModel> filteredRecipes = [];
 
-  // Add this: List of controllers for editing recipe fields
   final List<TextEditingController> controllers =
       List.generate(29, (index) => TextEditingController());
 
-  // Add this: variable for private field
   bool privateValue = false;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<RecipesProvider>().getRecipes();
+    });
+  }
 
   @override
   void dispose() {
@@ -279,25 +285,64 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _deleteUser(int id) async {
-    setState(() {
-      isPressed = true;
-    });
-    try {
-      await RecipesRepo().deleteRecipe(id);
-      setState(() {
-        filteredRecipes.removeWhere((w) => w.id == id);
-      });
-    } catch (e) {
-      throw Exception(e);
-    } finally {
-      setState(() {
-        isPressed = false;
-      });
+  List<String> categories = ['Frequent order', 'Veg', 'Fish', 'Egg', 'Chicken'];
+
+  void deleteRecipe(int productId) async {
+    final result = await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: Text(
+            'Are you sure?',
+            style: TextStyle(
+              color: Colors.black,
+            ),
+          ),
+          actions: [
+            Consumer<RecipesProvider>(
+              builder: (context, provider, _) {
+                return TextButton(
+                  onPressed: () async {
+                    await provider.deleteRecipe(productId);
+
+                    if (provider.deleteError != null) {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(provider.deleteError!),
+                        ),
+                      );
+                    } else {
+                      Navigator.pop(context, true);
+                    }
+                  },
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.red,
+                  ),
+                  child: provider.isDeleting
+                      ? CircularProgressIndicator.adaptive()
+                      : Text('delete'),
+                );
+              },
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.blue,
+              ),
+              child: Text('cancel'),
+            )
+          ],
+        );
+      },
+    );
+    if (result == true) {
+      context.read<RecipesProvider>().getRecipes();
     }
   }
-
-  List<String> categories = ['Frequent order', 'Veg', 'Fish', 'Egg', 'Chicken'];
 
   @override
   Widget build(BuildContext context) {
@@ -397,28 +442,27 @@ class _HomePageState extends State<HomePage> {
                     },
                   ),
                 ),
-                FutureBuilder(
-                  future: RecipesRepo().getAllRecipes(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
+                Consumer<RecipesProvider>(
+                  builder: (context, provider, _) {
+                    if (provider.isLoading) {
                       return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: \\${snapshot.error}'));
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    } else if (provider.error != null) {
+                      return Center(child: Text('Error: \\${provider.error}'));
+                    } else if (provider.recipes.isEmpty) {
                       return const Center(child: Text('No recipes found'));
                     }
-                    final recipes = snapshot.data!;
-                    filteredRecipes.addAll(recipes);
+                    final recipes = provider.recipes;
+                    print(recipes.length);
                     return GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: filteredRecipes.length,
+                      itemCount: recipes.length,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
-                        mainAxisExtent: 300,
+                        mainAxisExtent: 350,
                       ),
                       itemBuilder: (context, index) {
-                        final product = filteredRecipes[index];
+                        final product = recipes[index];
                         return InkWell(
                           onTap: () {
                             Navigator.push(
@@ -485,14 +529,13 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     IconButton(
                                       onPressed: () {
-                                        _deleteUser(product.id);
-                                        setState(() {});
+                                        deleteRecipe(product.id);
                                       },
                                       icon: Icon(
                                         Icons.delete,
                                         color: Colors.white,
                                       ),
-                                    )
+                                    ),
                                   ],
                                 ),
                               ],

@@ -5,18 +5,20 @@ import 'package:http/http.dart' as http;
 
 class RecipesRepo {
   Future<List<RecipesModel>> getAllRecipes() async {
-     final recipeBox = Hive.box('recipeBox');
+    final recipeBox = Hive.box('recipeBox');
     try {
       final incomingData = await http.get(
         Uri.parse("https://api.sampleapis.com/recipes/recipes"),
       );
       List data = jsonDecode(incomingData.body);
-      final List<RecipesModel> recipesModels =
+      final List<RecipesModel> recipes =
           data.map((e) => RecipesModel.fromJson(e)).toList();
-      return recipesModels;
-    } catch (e) { if (recipeBox.containsKey('posts')) {
+      await recipeBox.put('recipes', recipes);
+      return recipes;
+    } catch (e) {
+      if (recipeBox.containsKey('recipes')) {
         try {
-          return recipeBox.get('posts')!.cast<RecipesModel>();
+          return recipeBox.get('recipes')!.cast<RecipesModel>();
         } catch (e) {
           throw Exception("Xato");
         }
